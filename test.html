@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Salesforce REST API Test</title>
+</head>
+<body>
+  <h1>Salesforce REST API 呼び出し</h1>
+  <button onclick="callApi()">APIを呼ぶ！</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    let accessToken = null;
+    let instanceUrl = null;
+
+    // URLのハッシュからアクセストークンを取得
+    window.onload = function () {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      accessToken = params.get('access_token');
+      instanceUrl = params.get('instance_url');
+    };
+
+    async function callApi() {
+      if (!accessToken || !instanceUrl) {
+        alert('アクセストークンが見つかりません！');
+        return;
+      }
+
+      const response = await fetch(`${instanceUrl}/services/data/v59.0/sobjects/Account/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+
+      const data = await response.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
