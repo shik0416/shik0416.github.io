@@ -1,11 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Salesforce REST API Test</title>
+  <title>Salesforce REST API Bulk Update</title>
 </head>
 <body>
-  <h1>Salesforce REST API 呼び出し</h1>
-  <button onclick="callApi()">APIを呼ぶ！</button>
+  <h1>Salesforce REST API 複数レコード更新</h1>
+
+  <!-- 🔑 認証情報 -->
+  <label for="clientId">Client ID:</label>
+  <input type="text" id="clientId" size="50" placeholder="Client ID を入力"><br><br>
+
+  <label for="redirectUri">Redirect URI:</label>
+  <input type="text" id="redirectUri" size="50" placeholder="https://localhost/callback.html"><br><br>
+
+  <button onclick="startAuth()">Salesforceへの認証</button>
+
+  <hr>
+
+  <!-- 📝 JSON入力フォーム -->
+  <h2>複数レコード更新</h2>
+  <p>以下の形式でJSONを入力してください：</p>
+  <pre>
+[
+  {
+    "ContractId": "10010000",
+    "MailAddress": "test000666@gmail.com",
+    "ProductName": "Mobox スタンダード2年プラン SEIBERLING SL201 165/55R14 72V  4本　変更後222222",
+    "PlanStartDate": "2021/10/15",
+    "Plan": "スタンダード",
+    "ContractYears": "3年",
+    "Tire": "ICEPARTNER2",
+    "Size": "185/65R15",
+    "Season": "冬",
+    "Status": "契約中",
+    "LotationRemaining": "5",
+    "SafetyInspectRemaining": "99",
+    "CenterfitRemaining": "6",
+    "NitrogenGasFillingRemaining": "99",
+    "PunctureReparationRemaining": "1",
+    "CloakRemaining": "0",
+    "Option": "クローク",
+    "CancellationReason": "解約理由123"
+  },
+  {
+    "ContractId": "10010001",
+    "MailAddress": "test000666@gmail.com",
+    "ProductName": "Mobox スタンダード2年プラン SEIBERLING SL201 165/55R14 72V  4本　変更後222222",
+    "PlanStartDate": "2021/10/15",
+    "Plan": "スタンダード",
+    "ContractYears": "3年",
+    "Tire": "ICEPARTNER2",
+    "Size": "185/65R15",
+    "Season": "冬",
+    "Status": "契約中",
+    "LotationRemaining": "5",
+    "SafetyInspectRemaining": "99",
+    "CenterfitRemaining": "6",
+    "NitrogenGasFillingRemaining": "99",
+    "PunctureReparationRemaining": "1",
+    "CloakRemaining": "0",
+    "Option": "クローク",
+    "CancellationReason": "解約理由123"
+  }
+]
+  </pre>
+
+  <textarea id="jsonInput" rows="15" cols="80" placeholder="ここにJSONを入力"></textarea><br><br>
+  <button onclick="sendComposite()">レコードを一括更新！</button>
 
   <pre id="output"></pre>
 
@@ -13,7 +74,7 @@
     let accessToken = null;
     let instanceUrl = null;
 
-    // URLのハッシュからアクセストークンを取得
+    // アクセストークン取得
     window.onload = function () {
       const hash = window.location.hash.substring(1);
       const params = new URLSearchParams(hash);
@@ -21,23 +82,54 @@
       instanceUrl = params.get('instance_url');
     };
 
-    async function callApi() {
-      if (!accessToken || !instanceUrl) {
-        alert('アクセストークンが見つかりません！');
+    // 認証処理
+    function startAuth() {
+      const clientId = document.getElementById('clientId').value.trim();
+      const redirectUriRaw = document.getElementById('redirectUri').value.trim();
+
+      if (!clientId || !redirectUriRaw) {
+        alert('Client ID と Redirect URI を入力してください！');
         return;
       }
 
-      const response = await fetch(`${instanceUrl}/services/data/v59.0/sobjects/Account/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
+      const redirectUri = encodeURIComponent(redirectUriRaw);
+      const authUrl = `https://test.salesforce.com/services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}`;
+      window.location.href = authUrl;
+    }
 
-      const data = await response.json();
-      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    // Composite APIで一括更新
+    async function sendComposite() {
+      if (!accessToken || !instanceUrl) {
+        alert('認証が必要です！');
+        return;
+      }
+
+      let records;
+      try {
+        records = JSON.parse(document.getElementById('jsonInput').value);
+      } catch (e) {
+        alert('JSONの形式が正しくありません！');
+        return;
+      }
+
+      const url = `${instanceUrl}/services/apexrest/syncHoldingVehicles`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ batchRequests: records })
+        });
+
+        const result = await response.json();
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        document.getElementById('output').textContent = '💥 エラー: ' + err.message;
+      }
     }
   </script>
 </body>
 </html>
-
-
