@@ -121,7 +121,7 @@
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify([ records ])
+          body: JSON.stringify( records )
         });
 
         const result = await response.json();
