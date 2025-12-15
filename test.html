@@ -2,6 +2,27 @@
 <html>
 <head>
   <title>Salesforce REST API Bulk Update</title>
+  <style>
+  .container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .form-area {
+    flex: 1;
+  }
+
+  .output-area {
+    flex: 1;
+    max-width: 50%;
+    overflow: auto;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+  }
+</style>
 </head>
 <body>
   <h1>Salesforce REST API 複数レコード更新</h1>
@@ -65,10 +86,14 @@
 ]
   </pre>
 
-  <textarea id="jsonInput" rows="15" cols="80" placeholder="ここにJSONを入力"></textarea><br><br>
-  <button onclick="sendComposite()">レコードを一括更新！</button>
-
-  <pre id="output"></pre>
+  <div class="container">
+  <div class="form-area">
+      <textarea id="jsonInput" rows="15" cols="80" placeholder="ここにJSONを入力"></textarea><br><br>
+      <button onclick="sendComposite()">レコードを一括更新！</button>
+  </div>
+  <h2>結果：</h2>
+  <pre id="output" class="output-area"></pre>
+</div>
 
   <script>
     let accessToken = null;
