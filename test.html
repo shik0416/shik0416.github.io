@@ -107,10 +107,7 @@
       instanceUrl = params.get('instance_url');
       // 👇 URLからハッシュを消す！
       if (window.history && window.history.replaceState) {
-        if (!window.location.search.includes('token=1')) {
-          const newUrl = window.location.pathname + '?token=1';
-          window.history.replaceState(null, null, newUrl);
-        }
+        window.history.replaceState(null, null, window.location.pathname);
       }
     };
 
