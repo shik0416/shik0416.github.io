@@ -30,6 +30,7 @@
   <!-- 🔑 認証情報 -->
   <label for="clientId">Client ID:</label>
   <input type="text" id="clientId" size="50" placeholder="Client ID を入力"><br><br>
+  <input type="text" id="clientSecret" size="50" placeholder="Client Secret を入力"><br><br>
 
   <label for="redirectUri">Redirect URI:</label>
   <input type="text" id="redirectUri" size="50" placeholder="https://localhost/callback.html"><br><br>
@@ -45,26 +46,6 @@
 [
   {
     "ContractId": "10010000",
-    "MailAddress": "test000666@gmail.com",
-    "ProductName": "Mobox スタンダード2年プラン SEIBERLING SL201 165/55R14 72V  4本　変更後222222",
-    "PlanStartDate": "2021/10/15",
-    "Plan": "スタンダード",
-    "ContractYears": "3年",
-    "Tire": "ICEPARTNER2",
-    "Size": "185/65R15",
-    "Season": "冬",
-    "Status": "契約中",
-    "LotationRemaining": "5",
-    "SafetyInspectRemaining": "99",
-    "CenterfitRemaining": "6",
-    "NitrogenGasFillingRemaining": "99",
-    "PunctureReparationRemaining": "1",
-    "CloakRemaining": "0",
-    "Option": "クローク",
-    "CancellationReason": "解約理由123"
-  },
-  {
-    "ContractId": "10010001",
     "MailAddress": "test000666@gmail.com",
     "ProductName": "Mobox スタンダード2年プラン SEIBERLING SL201 165/55R14 72V  4本　変更後222222",
     "PlanStartDate": "2021/10/15",
@@ -102,18 +83,37 @@
     // アクセストークン取得
     window.onload = function () {
       const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      accessToken = params.get('access_token');
-      instanceUrl = params.get('instance_url');
+      //const params = new URLSearchParams(hash);
+      //accessToken = params.get('access_token');
+      //instanceUrl = params.get('instance_url');
       // 👇 URLからハッシュを消す！
       //if (window.history && window.history.replaceState) {
       //  window.history.replaceState(null, null, window.location.pathname);
       //}
+
+      const code = new URLSearchParams(window.location.search).get('code');
+      const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
+      const redirectUriRaw = document.getElementById('redirectUri').value.trim();
+      const params = new URLSearchParams(); 
+      params.append('grant_type', 'authorization_code'); 
+      params.append('code', code); 
+      params.append('client_id', clientId); 
+      params.append('redirect_uri', redirectUriRaw); 
+      params.append('code_verifier', codeVerifier); 
+      const response = fetch('https://test.salesforce.com/services/oauth2/token', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
+        body: params 
+      });
+      const data = response.json(); 
+      console.log('🎉 アクセストークン:', data.access_token);
     };
 
     // 認証処理
     function startAuth() {
       const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
       const redirectUriRaw = document.getElementById('redirectUri').value.trim();
 
       if (!clientId || !redirectUriRaw) {
@@ -122,13 +122,14 @@
       }
 
       const redirectUri = encodeURIComponent(redirectUriRaw);
-      //const codeVerifier = generateCodeVerifier(64); 
-      //const codeChallenge = generateCodeChallenge(codeVerifier);
       //const authUrl = `https://test.salesforce.com/services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}`;
-      //const authUrl = `https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`;
-      generatePKCE().then(({ codeVerifier, codeChallenge }) => { sessionStorage.setItem('code_verifier', codeVerifier); // 後で使う！ 
-      const authUrl = `https://test.salesforce.com/services/oauth2/authorize` + `?response_type=code` + `&client_id=${clientId}` + `&redirect_uri=${redirectUri}` + `&code_challenge=${encodeURIComponent(codeChallenge)}` + `&code_challenge_method=S256`; 
-      window.location.href = authUrl; });
+      
+      generatePKCE().then(({ codeVerifier, codeChallenge }) => { 
+        sessionStorage.setItem('code_verifier', codeVerifier); // 後で使う！ 
+        const authUrl = `https://test.salesforce.com/services/oauth2/authorize` + `?response_type=code` + `&client_id=${clientId}` + `&redirect_uri=${redirectUri}` + `&code_challenge=${encodeURIComponent(codeChallenge)}` + `&code_challenge_method=S256`; 
+        window.location.href = authUrl;
+        
+      });
       //window.location.href = authUrl;
     }
 
