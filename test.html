@@ -82,14 +82,14 @@
     // アクセストークン取得
     window.onload = function () {
       const hash = window.location.hash.substring(1);
-      //const params = new URLSearchParams(hash);
-      //accessToken = params.get('access_token');
-      //instanceUrl = params.get('instance_url');
+      const params = new URLSearchParams(hash);
+      accessToken = params.get('access_token');
+      instanceUrl = params.get('instance_url');
       // 👇 URLからハッシュを消す！
       //if (window.history && window.history.replaceState) {
       //  window.history.replaceState(null, null, window.location.pathname);
       //}
-      a();
+      //a();
     };
 
     // 認証処理
@@ -105,17 +105,17 @@
         return;
       }
 
-      const redirectUri = encodeURIComponent(redirectUriRaw);
-      sessionStorage.setItem('redirectUri', redirectUri);
-      //const authUrl = `https://test.salesforce.com/services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}`;
-      
+      //const redirectUri = encodeURIComponent(redirectUriRaw);
+      //sessionStorage.setItem('redirectUri', redirectUri);
+      const authUrl = `https://test.salesforce.com/services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}`;
+      /*
       generatePKCE().then(({ codeVerifier, codeChallenge }) => { 
         sessionStorage.setItem('code_verifier', codeVerifier); // 後で使う！ 
         const authUrl = `https://test.salesforce.com/services/oauth2/authorize` + `?response_type=code` + `&client_id=${clientId}` + `&redirect_uri=${redirectUri}` + `&code_challenge=${encodeURIComponent(codeChallenge)}` + `&code_challenge_method=S256`; 
         window.location.href = authUrl;
         
-      });
-      //window.location.href = authUrl;
+      });*/
+      window.location.href = authUrl;
     }
 
     async function a() {
