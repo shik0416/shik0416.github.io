@@ -30,8 +30,6 @@
   <!-- 🔑 認証情報 -->
   <label for="clientId">Client ID:</label>
   <input type="text" id="clientId" size="50" placeholder="Client ID を入力"><br><br>
-  <label for="clientSecret">Client Secret:</label>
-  <input type="text" id="clientSecret" size="50" placeholder="Client Secret を入力"><br><br>
 
   <label for="redirectUri">Redirect URI:</label>
   <input type="text" id="redirectUri" size="50" placeholder="https://localhost/callback.html"><br><br>
@@ -93,9 +91,8 @@
       //}
       const codeVerifier = sessionStorage.getItem('code_verifier');
       const code = new URLSearchParams(window.location.search).get('code');
-      const clientId = document.getElementById('clientId').value.trim();
-      const clientSecret = document.getElementById('clientSecret').value.trim();
-      const redirectUriRaw = document.getElementById('redirectUri').value.trim();
+      const clientId = sessionStorage.getItem('clientId');
+      const redirectUriRaw = sessionStorage.getItem('redirectUriRaw');
       const params = new URLSearchParams(); 
       params.append('grant_type', 'authorization_code'); 
       params.append('code', code); 
@@ -114,8 +111,10 @@
     // 認証処理
     function startAuth() {
       const clientId = document.getElementById('clientId').value.trim();
-      const clientSecret = document.getElementById('clientSecret').value.trim();
       const redirectUriRaw = document.getElementById('redirectUri').value.trim();
+      sessionStorage.setItem('clientId', clientId);
+      sessionStorage.setItem('redirectUri', redirectUri);
+
 
       if (!clientId || !redirectUriRaw) {
         alert('Client ID と Redirect URI を入力してください！');
