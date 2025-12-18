@@ -30,6 +30,7 @@
   <!-- 🔑 認証情報 -->
   <label for="clientId">Client ID:</label>
   <input type="text" id="clientId" size="50" placeholder="Client ID を入力"><br><br>
+  <label for="clientSecret">Client Secret:</label>
   <input type="text" id="clientSecret" size="50" placeholder="Client Secret を入力"><br><br>
 
   <label for="redirectUri">Redirect URI:</label>
@@ -90,7 +91,7 @@
       //if (window.history && window.history.replaceState) {
       //  window.history.replaceState(null, null, window.location.pathname);
       //}
-
+      const codeVerifier = sessionStorage.getItem('code_verifier');
       const code = new URLSearchParams(window.location.search).get('code');
       const clientId = document.getElementById('clientId').value.trim();
       const clientSecret = document.getElementById('clientSecret').value.trim();
