@@ -129,8 +129,7 @@
       window.location.href = authUrl;
     }
 
-    // ランダムな文字列を生成
-    function generateCodeVerifier(length = 128) {
+    function generateCodeVerifier(length = 64) {
       const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
       let result = '';
       const values = new Uint32Array(length);
@@ -141,7 +140,6 @@
       return result;
     }
 
-    // SHA256でハッシュしてBase64URLエンコード
     async function generateCodeChallenge(codeVerifier) {
       const encoder = new TextEncoder();
       const data = encoder.encode(codeVerifier);
@@ -149,7 +147,7 @@
       const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
-        .replace(/=+$/, '');
+        .replace(/=+$/, ''); // Base64URL形式に変換！
       return base64;
     }
 
